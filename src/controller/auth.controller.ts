@@ -27,7 +27,37 @@ export const signin = async (req: Request, res: Response) => {
           "Password must contain at least one number and one uppercase letter.",
       });
     }
-  } catch (error: any) {}
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials. Try again" });
+    }
+
+    //generate token
+    const token = generateToken(user._id.toString());
+
+    res.status(200).json({
+      payload: {
+        token,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          profileImage: user.profileImage,
+        },
+      },
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
 };
 
 export const signup = async (req: Request, res: Response) => {
