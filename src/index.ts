@@ -7,7 +7,7 @@ import helmet from "helmet";
 import config from "./config";
 
 //lib
-import { connectDB } from "./lib/db";
+import { connectDB, disconnectDB } from "./lib/db";
 import limiter from "./lib/express-rate-limiter";
 
 //types
@@ -59,12 +59,14 @@ app.use(limiter);
   try {
     console.log("Server is starting...");
 
+    await connectDB();
+
     app.use("/api/v1/auth", authRouter);
     app.use("/api/v1/books", bookRouter);
 
     app.listen(config.PORT, () => {
       console.log(`Server is running on port http://localhost:${config.PORT}`);
-      connectDB();
+     
     });
   } catch (error) {
     console.error("Error starting the server:", error);
@@ -77,6 +79,7 @@ app.use(limiter);
 //server shutdown gracefully
 const handleServerShutdown = async() => {
     try{
+      await disconnectDB();
         console.log('Server SHUTDOWN')
         process.exit(0);
     }catch(error){
