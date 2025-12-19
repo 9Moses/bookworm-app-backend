@@ -18,6 +18,7 @@ import authRouter from "./routes/v1/auth.routes";
 import bookRouter from "./routes/v1/bookapp.routes";
 
 const app = express();
+const port = config.PORT || 3000;
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
@@ -64,8 +65,8 @@ app.use(limiter);
     app.use("/api/v1/auth", authRouter);
     app.use("/api/v1/books", bookRouter);
 
-    app.listen(config.PORT, () => {
-      console.log(`Server is running on port http://localhost:${config.PORT}`);
+    app.listen(port, () => {
+      console.log(`Server is running on port http://localhost:${port}`);
      
     });
   } catch (error) {
